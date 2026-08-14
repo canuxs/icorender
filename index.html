@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icorender</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffe082; /* Warm yellow background */
+            color: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: #ffc107; /* Darker vibrant yellow header */
+            padding: 24px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-container img {
+            height: 32px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #000000;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Body Content */
+        main {
+            padding: 40px;
+            flex: 1;
+            max-width: 900px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 28px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #ffc107;
+            padding-bottom: 4px;
+            display: inline-block;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        code {
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.95rem;
+        }
+
+        pre {
+            background-color: #ffffff;
+            border: 1px solid #e0c060;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        .cmd-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .cmd-table th, .cmd-table td {
+            border: 1px solid #e0c060;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        .cmd-table th {
+            background-color: #ffc107;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="favicon.png" alt="favicon.png">
+        </div>
+        <nav>
+            <a href="https://github.com/canuxs/icorender/releases" target="_blank">Releases</a>
+            <a href="https://github.com/canuxs/icorender/issues" target="_blank">Issues</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Icorender Documentation</h1>
+        <p>Welcome to the official <strong>Icorender</strong> wiki. This guide covers project architecture, command-line interface usage, and feature overview.</p>
+
+        <h2>What is Icorender?</h2>
+        <p><strong>Icorender</strong> is a command-line interface tool designed to package and append icon files (<code>.ico</code>) directly into a binary library (<code>project.dll</code>). It provides built-in backup management and external script execution capabilities.</p>
+
+        <h2>Getting Started</h2>
+        <p>Run the main CLI entry point using Python:</p>
+        <pre><code>python main.py</code></pre>
+
+        <h2>Available Commands</h2>
+        <table class="cmd-table">
+            <thead>
+                <tr>
+                    <th>Command</th>
+                    <th>Syntax</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>add</code></td>
+                    <td><code>add &lt;filename.ico&gt;</code></td>
+                    <td>Reads an icon from the <code>assets/</code> folder and appends its binary data to <code>project.dll</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>backup</code></td>
+                    <td><code>backup</code></td>
+                    <td>Creates a dated backup snapshot (<code>YYYY-MM-DD.dll</code>) in the <code>backups/</code> folder.</td>
+                </tr>
+                <tr>
+                    <td><code>backup . name</code></td>
+                    <td><code>backup . name &lt;name&gt;</code></td>
+                    <td>Creates a custom named backup snapshot (<code>&lt;name&gt;.dll</code>) in <code>backups/</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>tools</code></td>
+                    <td><code>tools</code></td>
+                    <td>Executes the external <code>tools.py</code> utility script.</td>
+                </tr>
+                <tr>
+                    <td><code>help</code></td>
+                    <td><code>help</code></td>
+                    <td>Displays the list of supported CLI commands.</td>
+                </tr>
+                <tr>
+                    <td><code>exit</code></td>
+                    <td><code>exit</code></td>
+                    <td>Terminates the interactive shell session.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Directory Structure</h2>
+        <ul>
+            <li><code>assets/</code>: Directory storing raw <code>.ico</code> image files.</li>
+            <li><code>backups/</code>: Contains generated <code>.dll</code> backups.</li>
+            <li><code>project.dll</code>: Target binary file where icon data is appended.</li>
+            <li><code>icon.ico</code>: Program icon used for taskbar/title bar rendering.</li>
+            <li><code>tools.py</code>: External helper script launched via the <code>tools</code> command.</li>
+        </ul>
+    </main>
+
+</body>
+</html>
