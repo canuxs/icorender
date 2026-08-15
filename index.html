@@ -156,7 +156,7 @@
 
     <main>
         <h1>Icorender Documentation</h1>
-        <p>Welcome to the official <strong>Icorender</strong> wiki. This guide covers project architecture, command-line interface usage, and feature overview.</p>
+        <p>Welcome to the official <strong>Icorender</strong> wiki. This guide covers project architecture, command-line interface usage, and feature overview. This wiki is for the latest version. (1.0.2)</p>
 
         <h2>What is Icorender?</h2>
         <p><strong>Icorender</strong> is a command-line interface tool designed to package and append icon files (<code>.ico</code>) directly into a binary library (<code>project.dll</code>). It provides built-in backup management and external script execution capabilities.</p>
@@ -166,7 +166,45 @@
         <pre><code>python main.py</code></pre>
 
         <h2>Available Commands</h2>
-        <li>Use help command to view commands.</li>
+        
+        <table class="cmd-table">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>compile.py</code></td>
+                    <td>Reads icons from the <code>assets/</code> folder and exports <code>project.dll</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>tools.py</code></td>
+                    <td>It have Paint tool and version info.</td>
+                </tr>
+                <tr>
+                    <td><code>project.dll</code></td>
+                    <td>The export.</td>
+                </tr>
+                <tr>
+                    <td><code>links.html</code></td>
+                    <td>Links.</td>
+                </tr>
+                <tr>
+                    <td><code>icon.ico</code></td>
+                    <td>Icon of app.</td>
+                </tr>
+                <tr>
+                    <td><code>README.md</code></td>
+                    <td>Read it before using the app.</td>
+                </tr>
+                <tr>
+                    <td><code>assets/</code></td>
+                    <td>Icons for the project.dll</td>
+                </tr>
+            </tbody>
+        </table>
 
         <h2>Directory Structure</h2>
         <ul>
