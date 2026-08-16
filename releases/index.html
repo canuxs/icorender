@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta name="description" content="ICO to DLL packer in miniseconds, simple and effective. Only 40KB!">
+    <link rel="canonical" href="URL">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icorender - Releases</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffe082; /* Warm yellow background */
+            color: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: #ffc107; /* Darker vibrant yellow header */
+            padding: 24px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-container img {
+            height: 32px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #000000;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Body Content */
+        main {
+            padding: 40px;
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 28px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #ffc107;
+            padding-bottom: 4px;
+            display: inline-block;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        code {
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.95rem;
+        }
+
+        pre {
+            background-color: #ffffff;
+            border: 1px solid #e0c060;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        /* Release Card Styling */
+        .release-card {
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid #e0c060;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .release-header {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-bottom: 1px solid #e0c060;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media(min-width: 600px) {
+            .release-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .tag-badge {
+            display: inline-block;
+            background-color: #ffc107;
+            color: #000;
+            font-family: Consolas, monospace;
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #e0c060;
+        }
+
+        .release-date {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        /* Download Button Wrapper Inside Markdown */
+        .download-wrapper {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .download-btn {
+            background-color: #2e7d32;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .download-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        .download-count {
+            font-size: 0.85rem;
+            color: #333;
+            font-family: Consolas, monospace;
+        }
+
+        .loading-state, .error-state {
+            text-align: center;
+            padding: 40px;
+            font-weight: 500;
+        }
+
+        .error-state {
+            color: #c62828;
+            background-color: rgba(198, 40, 40, 0.1);
+            border: 1px solid #c62828;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="favicon.png" alt="favicon.png">
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="https://github.com/canuxs/icorender/" target="_blank">Source</a>
+            <a href="https://github.com/canuxs/icorender/releases" target="_blank">Releases</a>
+            <a href="dependences" target="_blank">Dependences</a>
+            <a href="LICENSE.txt" target="_blank">License</a>
+            <a href="https://github.com/canuxs/icorender/issues" target="_blank">Issues</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Icorender Releases</h1>
+        <p>Explore all official versions of <strong>Icorender</strong> fetched directly from GitHub, complete with integrated download trackers.</p>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading-state">Loading releases...</div>
+
+        <!-- Error State -->
+        <div id="error" class="error-state" style="display: none;"></div>
+
+        <!-- Releases Dynamic Container -->
+        <div id="releases-container"></div>
+    </main>
+
+    <!-- Firebase SDK & Dynamic Release Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, runTransaction, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // FIREBASE_STATS environment variable tanımı (Render vb. platformlarda build aşamasında buraya enjekte edilebilir)
+        const FIREBASE_STATS = "https://github-time-454ee-default-rtdb.europe-west1.firebasedatabase.app/";
+
+        const firebaseConfig = {
+            databaseURL: FIREBASE_STATS
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const owner = "canuxs";
+        const repo = "icorender";
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases`;
+
+        async function fetchReleases() {
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+            const containerEl = document.getElementById('releases-container');
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Failed to fetch GitHub releases.");
+                
+                const releases = await response.json();
+                loadingEl.remove();
+
+                if (releases.length === 0) {
+                    containerEl.innerHTML = '<p style="text-align: center;">No releases found.</p>';
+                    return;
+                }
+
+                releases.forEach(release => {
+                    const card = document.createElement('div');
+                    card.className = "release-card";
+
+                    // Parse markdown body using marked.js
+                    let rawHtml = marked.parse(release.body || "No description provided.");
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = rawHtml;
+
+                    // Find links containing "download" and replace them with buttons
+                    const links = tempDiv.querySelectorAll('a');
+                    links.forEach(link => {
+                        if (link.textContent.toLowerCase().includes('download') || link.href.toLowerCase().includes('download')) {
+                            const originalHref = link.href;
+                            const linkText = link.textContent || 'Download';
+                            
+                            const btnWrapper = document.createElement('div');
+                            btnWrapper.className = "download-wrapper";
+                            btnWrapper.innerHTML = `
+                                <button class="download-btn" data-url="${originalHref}">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    ${linkText}
+                                </button>
+                                <span class="download-count">Loading counts...</span>
+                            `;
+                            
+                            // Orijinal metin linkini tamamen silip yerine butonu ekliyoruz
+                            link.replaceWith(btnWrapper);
+                        }
+                    });
+
+                    const pubDate = new Date(release.published_at).toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'long', day: 'numeric'
+                    });
+
+                    card.innerHTML = `
+                        <div class="release-header">
+                            <div>
+                                <span class="tag-badge">${release.tag_name}</span>
+                                <h2 style="margin: 0; border: none; padding: 0; display: inline-block; margin-left: 8px;">${release.name || release.tag_name}</h2>
+                            </div>
+                            <span class="release-date">${pubDate}</span>
+                        </div>
+                    `;
+
+                    card.appendChild(tempDiv);
+                    containerEl.appendChild(card);
+                });
+
+                initDownloadActions();
+
+            } catch (err) {
+                loadingEl.remove();
+                errorEl.textContent = err.message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function initDownloadActions() {
+            const buttons = document.querySelectorAll('.download-btn');
+
+            buttons.forEach(button => {
+                const targetUrl = button.getAttribute('data-url');
+                const countSpan = button.nextElementSibling;
+                
+                // Firebase storage path: canuxs/icorender/downloads
+                const safeUrlKey = encodeURIComponent(targetUrl).replace(/\./g, '%2E');
+                const countRef = ref(db, `canuxs/icorender/downloads/${safeUrlKey}`);
+
+                // Read current download count
+                get(countRef).then((snapshot) => {
+                    const count = snapshot.exists() ? snapshot.val() : 0;
+                    countSpan.textContent = `(${count} downloads)`;
+                }).catch(() => {
+                    countSpan.textContent = "(0 downloads)";
+                });
+
+                // Click event to increment counter and redirect
+                button.addEventListener('click', async () => {
+                    try {
+                        await runTransaction(countRef, (currentCount) => {
+                            return (currentCount || 0) + 1;
+                        });
+                    } catch (e) {
+                        console.error("Failed to update counter:", e);
+                    }
+                    window.location.href = targetUrl;
+                });
+            });
+        }
+
+        fetchReleases();
+    </script>
+</body>
+</html>
