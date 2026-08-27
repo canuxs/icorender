@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <meta name="description" content="Publish Icorender packages directly to the community repository.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish Community Pack</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffe082; /* Warm yellow background */
+            color: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        header {
+            background-color: #ffc107; /* Darker vibrant yellow header */
+            padding: 24px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-container img {
+            height: 32px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #000000;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Body Content */
+        main {
+            padding: 40px;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 1px solid #e0c060;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            box-sizing: border-box;
+            border: 1px solid #e0c060;
+            border-radius: 4px;
+            background-color: #ffffff;
+            font-size: 0.95rem;
+        }
+
+        button {
+            background-color: #ffc107;
+            color: #000000;
+            border: 1px solid #d9a400;
+            padding: 12px;
+            width: 100%;
+            margin-top: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e0ac00;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 0.95rem;
+            text-align: center;
+            word-break: break-all;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="favicon.png" alt="favicon.png">
+        </div>
+        <nav>
+            <a href="https://github.com/canuxs/icorender/" target="_blank">Source</a>
+            <a href="releases" target="_blank">Releases</a>
+            <a href="dependences" target="_blank">Dependences</a>
+            <a href="LICENSE.txt" target="_blank">License</a>
+            <a href="https://github.com/canuxs/icorender/issues" target="_blank">Issues</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Publish Community Pack</h1>
+        <p>Upload your <code>.icopack</code> file to share it with the Icorender community. It will be automatically saved to the official repository structure.</p>
+
+        <div class="card">
+            <form id="uploadForm">
+                <label for="owner">GitHub Username / Owner:</label>
+                <input type="text" id="owner" required value="canuxs">
+
+                <label for="repo">Repository Name:</label>
+                <input type="text" id="repo" required value="icorender">
+
+                <label for="author">Author Name:</label>
+                <input type="text" id="author" required placeholder="e.g. CanBartu">
+                
+                <label for="file">Select .icopack File:</label>
+                <input type="file" id="file" accept=".icopack" required>
+                
+                <button type="submit">COMMIT & UPLOAD TO GITHUB</button>
+            </form>
+            <div id="status"></div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            status.style.color = "#000000";
+            status.textContent = "Reading file...";
+
+            const owner = document.getElementById('owner').value.trim();
+            const repo = document.getElementById('repo').value.trim();
+            const author = document.getElementById('author').value.trim();
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            const token = "{GITHUB_TOKEN}";
+
+            const safeAuthor = author.replace(/[^a-zA-Z0-9_\-]/g, '_');
+            const safeFilename = file.name;
+            const packFolderName = safeFilename.replace(/\.[^/.]+$/, "");
+            const safePackFolder = packFolderName.replace(/[^a-zA-Z0-9_\-]/g, '_');
+
+            const path = `community/data/${safeAuthor}/${safePackFolder}/${safeFilename}`;
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const base64Content = reader.result.split(',')[1];
+                
+                status.textContent = "Uploading to GitHub...";
+
+                try {
+                    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+                    
+                    let sha = null;
+                    const checkRes = await fetch(apiUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    if (checkRes.ok) {
+                        const fileData = await checkRes.json();
+                        sha = fileData.sha;
+                    }
+
+                    const bodyData = {
+                        message: `Community Upload: ${safeFilename} by ${safeAuthor}`,
+                        content: base64Content,
+                        branch: "main"
+                    };
+                    if (sha) bodyData.sha = sha;
+
+                    const putRes = await fetch(apiUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/vnd.github.v3+json'
+                        },
+                        body: JSON.stringify(bodyData)
+                    });
+
+                    const result = await putRes.json();
+
+                    if (putRes.ok) {
+                        status.style.color = "#2e7d32";
+                        status.textContent = "Success! File added to repository: " + path;
+                    } else {
+                        status.style.color = "#c62828";
+                        status.textContent = "GitHub Error: " + (result.message || putRes.statusText);
+                    }
+                } catch (err) {
+                    status.style.color = "#c62828";
+                    status.textContent = "Connection error occurred!";
+                }
+            };
+        };
+    </script>
+</body>
+</html>
