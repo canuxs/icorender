@@ -190,16 +190,18 @@
     <script>
         const owner = "canuxs";
         const repo = "icorender";
-        const token = "{GITHUB_TOKEN}";
 
         async function fetchCommunityPacks() {
             try {
-                // GitHub API ile community/data klasöründeki yazarları listele
                 const url = `https://api.github.com/repos/${owner}/${repo}/contents/community/data`;
-                const res = await fetch(url, {
-                    headers: token ? { 'Authorization': `token ${token}` } : {}
-                });
+                const res = await fetch(url);
                 
+                if (res.status === 404) {
+                    displayNewest([]);
+                    setupSearch([]);
+                    return;
+                }
+
                 if (!res.ok) throw new Error("Could not fetch community data");
                 const authors = await res.json();
 
@@ -208,16 +210,12 @@
                 for (const authorDir of authors) {
                     if (authorDir.type === "dir") {
                         const authorName = authorDir.name;
-                        const packsRes = await fetch(authorDir.url, {
-                            headers: token ? { 'Authorization': `token ${token}` } : {}
-                        });
+                        const packsRes = await fetch(authorDir.url);
                         if (packsRes.ok) {
                             const packDirs = await packsRes.json();
                             for (const packDir of packDirs) {
                                 if (packDir.type === "dir") {
-                                    const filesRes = await fetch(packDir.url, {
-                                        headers: token ? { 'Authorization': `token ${token}` } : {}
-                                    });
+                                    const filesRes = await fetch(packDir.url);
                                     if (filesRes.ok) {
                                         const files = await filesRes.json();
                                         const icopackFile = files.find(f => f.name.endsWith('.icopack'));
@@ -280,11 +278,10 @@
         async function displayNewest(packs) {
             const container = document.getElementById('newestResults');
             if (packs.length === 0) {
-                container.innerHTML = `<p>No packs found in community.</p>`;
+                container.innerHTML = `<p style="color: #555; font-style: italic;">No community packs published yet. Upload your first pack!</p>`;
                 return;
             }
 
-            // En yeni 3 projeyi al
             const newest = packs.slice(-3).reverse();
             container.innerHTML = "";
 
