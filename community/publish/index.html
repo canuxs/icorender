@@ -68,7 +68,7 @@
 
             const file = fileInput.files[0];
             statusMsg.style.color = "#b78103";
-            statusMsg.textContent = "Preparing file and committing to GitHub...";
+            statusMsg.textContent = "Checking file existence and preparing upload...";
 
             try {
                 const base64Content = await new Promise((resolve, reject) => {
@@ -82,7 +82,7 @@
                 const filePath = `community/data/${author}/${packFolderName}/${file.name}`;
                 const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
 
-                let sha = null;
+                // Dosyanın daha önce var olup olmadığını kontrol et
                 const checkRes = await fetch(apiUrl, {
                     headers: { 
                         'Authorization': `token ${token}`,
@@ -91,15 +91,13 @@
                 });
                 
                 if (checkRes.ok) {
-                    const existingFile = await checkRes.json();
-                    sha = existingFile.sha;
+                    throw new Error("This community pack already exists! You cannot overwrite an existing pack.");
                 }
 
                 const bodyData = {
                     message: `Add community pack by @${author}: ${file.name}`,
                     content: base64Content
                 };
-                if (sha) bodyData.sha = sha;
 
                 const putRes = await fetch(apiUrl, {
                     method: 'PUT',
@@ -120,7 +118,7 @@
                 statusMsg.textContent = "Successfully uploaded and committed to GitHub!";
             } catch (err) {
                 statusMsg.style.color = "#c62828";
-                statusMsg.textContent = `GitHub Error: ${err.message}`;
+                statusMsg.textContent = `Error: ${err.message}`;
             }
         }
     </script>
