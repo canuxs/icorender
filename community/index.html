@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <meta name="description" content="Explore and inspect community-created Icorender packs.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Packs</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffe082;
+            color: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #ffc107;
+            padding: 24px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-container img {
+            height: 32px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #000000;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 40px;
+            flex: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 28px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #ffc107;
+            padding-bottom: 4px;
+            display: inline-block;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 1px solid #e0c060;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #e0c060;
+            border-radius: 4px;
+            background-color: #ffffff;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .pack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 15px;
+        }
+
+        .pack-item {
+            background: #ffffff;
+            border: 1px solid #e0c060;
+            border-radius: 6px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .pack-item img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .author-tag {
+            font-weight: bold;
+            color: #b78103;
+            font-size: 0.9rem;
+        }
+
+        .file-list {
+            font-size: 0.85rem;
+            color: #444;
+            background: #fafafa;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="favicon.png" alt="favicon.png">
+        </div>
+        <nav>
+            <a href="index.html">Publish</a>
+            <a href="https://github.com/canuxs/icorender/" target="_blank">Source</a>
+            <a href="releases" target="_blank">Releases</a>
+            <a href="LICENSE.txt" target="_blank">License</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Community Gallery</h1>
+        <p>Explore community packs uploaded to the repository. View structural contents, author details, and thumbnails instantly.</p>
+
+        <!-- Search Section -->
+        <div class="card">
+            <h2>Search Projects</h2>
+            <input type="text" id="searchInput" placeholder="Search by author or package name...">
+            <div id="searchResults" class="pack-grid">
+                <p style="color: #666; font-style: italic;">Type to search repository packages...</p>
+            </div>
+        </div>
+
+        <!-- Newest Section -->
+        <div class="card">
+            <h2>Newest Packs</h2>
+            <div id="newestResults" class="pack-grid">
+                <p style="color: #666; font-style: italic;">Loading latest projects...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const owner = "canuxs";
+        const repo = "icorender";
+        const token = "{GITHUB_TOKEN}";
+
+        async function fetchCommunityPacks() {
+            try {
+                // GitHub API ile community/data klasöründeki yazarları listele
+                const url = `https://api.github.com/repos/${owner}/${repo}/contents/community/data`;
+                const res = await fetch(url, {
+                    headers: token ? { 'Authorization': `token ${token}` } : {}
+                });
+                
+                if (!res.ok) throw new Error("Could not fetch community data");
+                const authors = await res.json();
+
+                let allPacks = [];
+
+                for (const authorDir of authors) {
+                    if (authorDir.type === "dir") {
+                        const authorName = authorDir.name;
+                        const packsRes = await fetch(authorDir.url, {
+                            headers: token ? { 'Authorization': `token ${token}` } : {}
+                        });
+                        if (packsRes.ok) {
+                            const packDirs = await packsRes.json();
+                            for (const packDir of packDirs) {
+                                if (packDir.type === "dir") {
+                                    const filesRes = await fetch(packDir.url, {
+                                        headers: token ? { 'Authorization': `token ${token}` } : {}
+                                    });
+                                    if (filesRes.ok) {
+                                        const files = await filesRes.json();
+                                        const icopackFile = files.find(f => f.name.endsWith('.icopack'));
+                                        if (icopackFile) {
+                                            allPacks.push({
+                                                author: authorName,
+                                                name: packDir.name,
+                                                downloadUrl: icopackFile.download_url,
+                                                path: icopackFile.path
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                displayNewest(allPacks);
+                setupSearch(allPacks);
+
+            } catch (err) {
+                document.getElementById('newestResults').innerHTML = `<p style="color: #c62828;">Failed to load packs from repository.</p>`;
+                document.getElementById('searchResults').innerHTML = `<p style="color: #c62828;">Failed to load search index.</p>`;
+            }
+        }
+
+        async function parseIcopack(pack) {
+            try {
+                const response = await fetch(pack.downloadUrl);
+                const blob = await response.blob();
+                const zip = new JSZip();
+                const zipContent = await zip.loadAsync(blob);
+
+                let fileListHtml = "";
+                let thumbDataUrl = "";
+
+                for (const [filename, fileObj] of Object.entries(zipContent.files)) {
+                    fileListHtml += `<div>📄 ${filename}</div>`;
+                    if (filename === "thumbnails/icon.ico" || filename === "icon.ico") {
+                        const imgBlob = await fileObj.async("blob");
+                        thumbDataUrl = URL.createObjectURL(imgBlob);
+                    }
+                }
+
+                return {
+                    ...pack,
+                    fileListHtml,
+                    thumbDataUrl: thumbDataUrl || "favicon.png"
+                };
+            } catch (e) {
+                return {
+                    ...pack,
+                    fileListHtml: "<div>Error reading package structure</div>",
+                    thumbDataUrl: "favicon.png"
+                };
+            }
+        }
+
+        async function displayNewest(packs) {
+            const container = document.getElementById('newestResults');
+            if (packs.length === 0) {
+                container.innerHTML = `<p>No packs found in community.</p>`;
+                return;
+            }
+
+            // En yeni 3 projeyi al
+            const newest = packs.slice(-3).reverse();
+            container.innerHTML = "";
+
+            for (const pack of newest) {
+                const parsed = await parseIcopack(pack);
+                const card = document.createElement('div');
+                card.className = 'pack-item';
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img src="${parsed.thumbDataUrl}" alt="icon">
+                        <div>
+                            <div class="author-tag">@${parsed.author}</div>
+                            <div style="font-weight: bold; font-size: 1.05rem;">${parsed.name}</div>
+                        </div>
+                    </div>
+                    <div class="file-list">${parsed.fileListHtml}</div>
+                    <a href="${parsed.downloadUrl}" target="_blank" style="text-align: center; background: #ffc107; color: #000; padding: 6px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.9rem;">Download .icopack</a>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        function setupSearch(packs) {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            searchInput.addEventListener('input', async (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (!query) {
+                    searchResults.innerHTML = `<p style="color: #666; font-style: italic;">Type to search repository packages...</p>`;
+                    return;
+                }
+
+                const filtered = packs.filter(p => 
+                    p.author.toLowerCase().includes(query) || p.name.toLowerCase().includes(query)
+                );
+
+                if (filtered.length === 0) {
+                    searchResults.innerHTML = `<p style="color: #666;">No matching packages found.</p>`;
+                    return;
+                }
+
+                searchResults.innerHTML = `<p style="color: #666;">Loading search results...</p>`;
+                let htmlContent = "";
+
+                for (const pack of filtered) {
+                    const parsed = await parseIcopack(pack);
+                    htmlContent += `
+                        <div class="pack-item">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="${parsed.thumbDataUrl}" alt="icon">
+                                <div>
+                                    <div class="author-tag">@${parsed.author}</div>
+                                    <div style="font-weight: bold; font-size: 1.05rem;">${parsed.name}</div>
+                                </div>
+                            </div>
+                            <div class="file-list">${parsed.fileListHtml}</div>
+                            <a href="${parsed.downloadUrl}" target="_blank" style="text-align: center; background: #ffc107; color: #000; padding: 6px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.9rem;">Download .icopack</a>
+                        </div>
+                    `;
+                }
+                searchResults.innerHTML = htmlContent;
+            });
+        }
+
+        fetchCommunityPacks();
+    </script>
+</body>
+</html>
