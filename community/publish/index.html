@@ -27,7 +27,7 @@
 
     <header>
         <div class="logo-container">
-            <img src="favicon.png" alt="favicon.png">
+            <img src="/favicon.png" alt="logo">
         </div>
         <nav>
             <a href="community.html">Home</a>
@@ -53,7 +53,7 @@
     <script>
         const owner = "canuxs";
         const repo = "icorender";
-        const token = "BURAYA_GTIHUB_TOKENINIZI_YAZIN"; // GitHub token'ınızı buraya ekleyebilirsiniz
+        const token = "__GITHUB_TOKEN__";
 
         async function uploadPack() {
             const author = document.getElementById('authorInput').value.trim();
@@ -78,13 +78,18 @@
                     reader.readAsDataURL(file);
                 });
 
-                const path = `community/data/${author}/${file.name.replace('.icopack', '')}/${file.name}`;
-                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+                const packFolderName = file.name.replace(/\.icopack$/i, '');
+                const filePath = `community/data/${author}/${packFolderName}/${file.name}`;
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
 
                 let sha = null;
                 const checkRes = await fetch(apiUrl, {
-                    headers: { 'Authorization': `token ${token}` }
+                    headers: { 
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
                 });
+                
                 if (checkRes.ok) {
                     const existingFile = await checkRes.json();
                     sha = existingFile.sha;
@@ -100,7 +105,8 @@
                     method: 'PUT',
                     headers: {
                         'Authorization': `token ${token}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
                     },
                     body: JSON.stringify(bodyData)
                 });
