@@ -195,12 +195,6 @@
             background-color: #1b5e20;
         }
 
-        .download-count {
-            font-size: 0.85rem;
-            color: #333;
-            font-family: Consolas, monospace;
-        }
-
         .loading-state, .error-state {
             text-align: center;
             padding: 40px;
@@ -228,7 +222,7 @@
 
     <main>
         <h1>Icorender Releases</h1>
-        <p>Explore all official versions of <strong>Icorender</strong> fetched directly from GitHub, complete with integrated download trackers.</p>
+        <p>Explore all official versions of <strong>Icorender</strong> fetched directly from GitHub.</p>
 
         <!-- Loading State -->
         <div id="loading" class="loading-state">Loading releases...</div>
@@ -240,21 +234,8 @@
         <div id="releases-container"></div>
     </main>
 
-    <!-- Firebase SDK & Dynamic Release Script -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, runTransaction, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-        // FIREBASE_STATS environment variable tanımı (Render vb. platformlarda build aşamasında buraya enjekte edilebilir)
-        const FIREBASE_STATS = "https://github-time-454ee-default-rtdb.europe-west1.firebasedatabase.app/";
-
-        const firebaseConfig = {
-            databaseURL: FIREBASE_STATS
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
+    <!-- Dynamic Release Script -->
+    <script>
         const owner = "canuxs";
         const repo = "icorender";
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases`;
@@ -295,14 +276,12 @@
                             const btnWrapper = document.createElement('div');
                             btnWrapper.className = "download-wrapper";
                             btnWrapper.innerHTML = `
-                                <button class="download-btn" data-url="${originalHref}">
+                                <a href="${originalHref}" class="download-btn">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                     ${linkText}
-                                </button>
-                                <span class="download-count">Loading counts...</span>
+                                </a>
                             `;
                             
-                            // Orijinal metin linkini tamamen silip yerine butonu ekliyoruz
                             link.replaceWith(btnWrapper);
                         }
                     });
@@ -325,46 +304,11 @@
                     containerEl.appendChild(card);
                 });
 
-                initDownloadActions();
-
             } catch (err) {
                 loadingEl.remove();
                 errorEl.textContent = err.message;
                 errorEl.style.display = 'block';
             }
-        }
-
-        function initDownloadActions() {
-            const buttons = document.querySelectorAll('.download-btn');
-
-            buttons.forEach(button => {
-                const targetUrl = button.getAttribute('data-url');
-                const countSpan = button.nextElementSibling;
-                
-                // Firebase storage path: canuxs/icorender/downloads
-                const safeUrlKey = encodeURIComponent(targetUrl).replace(/\./g, '%2E');
-                const countRef = ref(db, `canuxs/icorender/downloads/${safeUrlKey}`);
-
-                // Read current download count
-                get(countRef).then((snapshot) => {
-                    const count = snapshot.exists() ? snapshot.val() : 0;
-                    countSpan.textContent = `(${count} downloads)`;
-                }).catch(() => {
-                    countSpan.textContent = "(0 downloads)";
-                });
-
-                // Click event to increment counter and redirect
-                button.addEventListener('click', async () => {
-                    try {
-                        await runTransaction(countRef, (currentCount) => {
-                            return (currentCount || 0) + 1;
-                        });
-                    } catch (e) {
-                        console.error("Failed to update counter:", e);
-                    }
-                    window.location.href = targetUrl;
-                });
-            });
         }
 
         fetchReleases();
